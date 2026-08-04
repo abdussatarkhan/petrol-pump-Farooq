@@ -74,7 +74,7 @@
             <ItemsControl ItemsSource="{Binding Toasts}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border Style="{StaticResource ToastBorder}">
+                        <Border>
                             <Border.Style>
                                 <Style TargetType="Border" BasedOn="{StaticResource ToastBorder}">
                                     <Style.Triggers>
