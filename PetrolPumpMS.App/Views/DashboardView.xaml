@@ -1,0 +1,100 @@
+<UserControl x:Class="PetrolPumpMS.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:PetrolPumpMS.App.Converters">
+    <UserControl.Resources>
+        <conv:CurrencyConverter x:Key="CurrencyConverter" />
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <TextBlock Text="Dashboard" Style="{StaticResource PageTitleText}" Margin="0,0,0,16" />
+
+            <!-- Stat cards -->
+            <UniformGrid Columns="4" Rows="1">
+                <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="TODAY'S SALES" Style="{StaticResource CaptionText}" />
+                        <TextBlock Text="{Binding TodaySalesTotal, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource StatValueText}" Foreground="{StaticResource AccentBrush}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="TRANSACTIONS TODAY" Style="{StaticResource CaptionText}" />
+                        <TextBlock Text="{Binding TodayTransactionCount}" Style="{StaticResource StatValueText}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Margin="0,0,12,0">
+                    <StackPanel>
+                        <TextBlock Text="TODAY'S EXPENSES" Style="{StaticResource CaptionText}" />
+                        <TextBlock Text="{Binding TodayExpenseTotal, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource StatValueText}" Foreground="{StaticResource WarningBrush}" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="CREDIT OUTSTANDING" Style="{StaticResource CaptionText}" />
+                        <TextBlock Text="{Binding TotalCreditOutstanding, Converter={StaticResource CurrencyConverter}}" Style="{StaticResource StatValueText}" Foreground="{StaticResource DangerBrush}" />
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <Grid Margin="0,20,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.1*" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="1.4*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Tank stock levels -->
+                <Border Grid.Column="0" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Tank Stock Levels" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,12" />
+                        <ItemsControl ItemsSource="{Binding Tanks}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,0,0,14">
+                                        <StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" Style="{StaticResource BodyText}" FontWeight="SemiBold" />
+                                                <Border Grid.Column="1" Style="{StaticResource DangerBadge}" Visibility="{Binding IsLowStock, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                    <TextBlock Text="LOW STOCK" Style="{StaticResource BadgeText}" Foreground="{StaticResource DangerBrush}" />
+                                                </Border>
+                                            </Grid>
+                                            <TextBlock Style="{StaticResource CaptionText}" Margin="0,2,0,6">
+                                                <Run Text="{Binding CurrentStock, StringFormat={}{0:N0}}" />
+                                                <Run Text=" / " />
+                                                <Run Text="{Binding Capacity, StringFormat={}{0:N0}}" />
+                                                <Run Text=" L" />
+                                            </TextBlock>
+                                            <ProgressBar Minimum="0" Maximum="{Binding Capacity}" Value="{Binding CurrentStock, Mode=OneWay}" Height="8" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+
+                <!-- Recent sales -->
+                <Border Grid.Column="2" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Recent Sales" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,12" />
+                        <DataGrid Style="{StaticResource AppDataGrid}" ItemsSource="{Binding RecentSales}" MaxHeight="420">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="90" />
+                                <DataGridTextColumn Header="Fuel" Binding="{Binding FuelType.Name}" Width="80" />
+                                <DataGridTextColumn Header="Qty" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="70" />
+                                <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat={}Rs. {0:N2}}" Width="*" />
+                                <DataGridTextColumn Header="Payment" Binding="{Binding PaymentMode}" Width="80" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

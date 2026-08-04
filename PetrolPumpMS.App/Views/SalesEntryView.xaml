@@ -1,0 +1,88 @@
+<UserControl x:Class="PetrolPumpMS.App.Views.SalesEntryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <TextBlock Text="Sales Entry" Style="{StaticResource PageTitleText}" Margin="0,0,0,16" />
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="1.3*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Entry form -->
+                <Border Grid.Column="0" Style="{StaticResource Card}" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Text="New Sale" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,16" />
+
+                        <TextBlock Text="Nozzle" Style="{StaticResource FieldLabelText}" />
+                        <ComboBox Style="{StaticResource AppComboBox}" ItemsSource="{Binding Nozzles}" DisplayMemberPath="Name"
+                                  SelectedItem="{Binding SelectedNozzle}" Margin="0,0,0,14" />
+
+                        <TextBlock Text="Opening Reading" Style="{StaticResource FieldLabelText}" />
+                        <TextBox Style="{StaticResource AppTextBox}" Text="{Binding OpeningReading, Mode=OneWay, StringFormat={}{0:N2}}" IsReadOnly="True" Margin="0,0,0,14" />
+
+                        <TextBlock Text="Closing Reading" Style="{StaticResource FieldLabelText}" />
+                        <TextBox Style="{StaticResource AppTextBox}" Text="{Binding ClosingReadingText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,14" />
+
+                        <Grid Margin="0,0,0,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Quantity" Style="{StaticResource FieldLabelText}" />
+                                <TextBox Style="{StaticResource AppTextBox}" Text="{Binding Quantity, Mode=OneWay, StringFormat={}{0:N2}}" IsReadOnly="True" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Amount" Style="{StaticResource FieldLabelText}" />
+                                <TextBox Style="{StaticResource AppTextBox}" Text="{Binding Amount, Mode=OneWay, StringFormat={}Rs. {0:N2}}" IsReadOnly="True" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="Attendant / Cashier" Style="{StaticResource FieldLabelText}" />
+                        <ComboBox Style="{StaticResource AppComboBox}" ItemsSource="{Binding Employees}" DisplayMemberPath="Name"
+                                  SelectedItem="{Binding SelectedEmployee}" Margin="0,0,0,14" />
+
+                        <TextBlock Text="Payment Mode" Style="{StaticResource FieldLabelText}" />
+                        <ComboBox Style="{StaticResource AppComboBox}" ItemsSource="{Binding PaymentModes}"
+                                  SelectedItem="{Binding SelectedPaymentMode}" Margin="0,0,0,14" />
+
+                        <StackPanel Visibility="{Binding IsCreditMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                            <TextBlock Text="Customer" Style="{StaticResource FieldLabelText}" />
+                            <ComboBox Style="{StaticResource AppComboBox}" ItemsSource="{Binding Customers}" DisplayMemberPath="Name"
+                                      SelectedItem="{Binding SelectedCustomer}" Margin="0,0,0,14" />
+                        </StackPanel>
+
+                        <TextBlock Text="{Binding ErrorMessage}" Style="{StaticResource ValidationErrorText}"
+                                   Visibility="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyToVisibilityConverter}}" Margin="0,0,0,10" />
+
+                        <Button Content="Record Sale" Style="{StaticResource PrimaryButton}" Command="{Binding SaveCommand}"
+                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
+                    </StackPanel>
+                </Border>
+
+                <!-- Recent sales -->
+                <Border Grid.Column="2" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Recent Sales" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,12" />
+                        <DataGrid Style="{StaticResource AppDataGrid}" ItemsSource="{Binding RecentSales}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="90" />
+                                <DataGridTextColumn Header="Time" Binding="{Binding Time}" Width="80" />
+                                <DataGridTextColumn Header="Nozzle" Binding="{Binding Nozzle.Name}" Width="80" />
+                                <DataGridTextColumn Header="Fuel" Binding="{Binding FuelType.Name}" Width="80" />
+                                <DataGridTextColumn Header="Qty" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="70" />
+                                <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat={}Rs. {0:N2}}" Width="100" />
+                                <DataGridTextColumn Header="Payment" Binding="{Binding PaymentMode}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

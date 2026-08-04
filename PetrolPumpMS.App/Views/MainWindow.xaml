@@ -1,0 +1,103 @@
+<Window x:Class="PetrolPumpMS.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PetrolPumpMS.App.ViewModels"
+        xmlns:views="clr-namespace:PetrolPumpMS.App.Views"
+        xmlns:conv="clr-namespace:PetrolPumpMS.App.Converters"
+        Style="{StaticResource AppWindow}"
+        Title="Petrol Pump Management System" Height="800" Width="1280" WindowStartupLocation="CenterScreen" MinHeight="600" MinWidth="1000">
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><views:DashboardView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SalesEntryViewModel}"><views:SalesEntryView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:FuelManagementViewModel}"><views:FuelManagementView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:EmployeesViewModel}"><views:EmployeesView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:CustomersViewModel}"><views:CustomersView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ExpensesViewModel}"><views:ExpensesView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ReportsViewModel}"><views:ReportsView /></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><views:SettingsView /></DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="230" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.Column="0" Background="{StaticResource SidebarBrush}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="20,24,20,20">
+                    <TextBlock Text="⛽ PetrolPumpMS" Foreground="{StaticResource TextOnDarkBrush}" FontSize="17" FontWeight="Bold" />
+                    <TextBlock Text="{Binding CurrentUserName}" Foreground="{StaticResource TextOnDarkMutedBrush}" FontSize="12" Margin="0,10,0,0" />
+                    <TextBlock Text="{Binding CurrentUserRole}" Foreground="{StaticResource TextOnDarkMutedBrush}" FontSize="11" />
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,0,0,16">
+                    <Button Content="Sign out" Style="{StaticResource SecondaryButton}" Margin="16,0" Command="{Binding LogoutCommand}" />
+                </StackPanel>
+
+                <StackPanel>
+                    <RadioButton Content="Dashboard" Style="{StaticResource SidebarNavButton}" GroupName="Nav"
+                                 IsChecked="{Binding ActivePage, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dashboard}"
+                                 Command="{Binding NavigateToCommand}" CommandParameter="{x:Static vm:AppPage.Dashboard}" />
+                    <RadioButton Content="Sales Entry" Style="{StaticResource SidebarNavButton}" GroupName="Nav"
+                                 IsChecked="{Binding ActivePage, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=SalesEntry}"
+                                 Command="{Binding NavigateToCommand}" CommandParameter="{x:Static vm:AppPage.SalesEntry}" />
+                    <RadioButton Content="Fuel &amp; Tanks" Style="{StaticResource SidebarNavButton}" GroupName="Nav"
+                                 IsChecked="{Binding ActivePage, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=FuelManagement}"
+                                 Command="{Binding NavigateToCommand}" CommandParameter="{x:Static vm:AppPage.FuelManagement}" />
+                    <RadioButton Content="Employees" Style="{StaticResource SidebarNavButton}" GroupName="Nav"
+                                 IsChecked="{Binding ActivePage, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Employees}"
+                                 Command="{Binding NavigateToCommand}" CommandParameter="{x:Static vm:AppPage.Employees}" />
+                    <RadioButton Content="Customers / Credit" Style="{StaticResource SidebarNavButton}" GroupName="Nav"
+                                 IsChecked="{Binding ActivePage, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Customers}"
+                                 Command="{Binding NavigateToCommand}" CommandParameter="{x:Static vm:AppPage.Customers}" />
+                    <RadioButton Content="Expenses" Style="{StaticResource SidebarNavButton}" GroupName="Nav"
+                                 IsChecked="{Binding ActivePage, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Expenses}"
+                                 Command="{Binding NavigateToCommand}" CommandParameter="{x:Static vm:AppPage.Expenses}" />
+                    <RadioButton Content="Reports" Style="{StaticResource SidebarNavButton}" GroupName="Nav"
+                                 IsChecked="{Binding ActivePage, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Reports}"
+                                 Command="{Binding NavigateToCommand}" CommandParameter="{x:Static vm:AppPage.Reports}" />
+                    <RadioButton Content="Settings" Style="{StaticResource SidebarNavButton}" GroupName="Nav"
+                                 IsChecked="{Binding ActivePage, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Settings}"
+                                 Command="{Binding NavigateToCommand}" CommandParameter="{x:Static vm:AppPage.Settings}" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Content -->
+        <Grid Grid.Column="1">
+            <ContentControl Content="{Binding CurrentViewModel}" Margin="28" />
+
+            <!-- Toasts -->
+            <ItemsControl ItemsSource="{Binding Toasts}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,24,24">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Style="{StaticResource ToastBorder}">
+                            <Border.Style>
+                                <Style TargetType="Border" BasedOn="{StaticResource ToastBorder}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Kind}" Value="Success">
+                                            <Setter Property="Background" Value="{StaticResource SuccessBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Kind}" Value="Error">
+                                            <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Kind}" Value="Warning">
+                                            <Setter Property="Background" Value="{StaticResource WarningBrush}" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Kind}" Value="Info">
+                                            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                            <TextBlock Text="{Binding Text}" Foreground="White" FontSize="13" TextWrapping="Wrap" />
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Grid>
+</Window>

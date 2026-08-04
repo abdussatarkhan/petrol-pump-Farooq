@@ -1,0 +1,201 @@
+<UserControl x:Class="PetrolPumpMS.App.Views.FuelManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel>
+        <TextBlock Text="Fuel &amp; Tank Management" Style="{StaticResource PageTitleText}" Margin="0,0,0,16" />
+
+        <TextBlock Text="{Binding ErrorMessage}" Style="{StaticResource ValidationErrorText}"
+                   Visibility="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyToVisibilityConverter}}" Margin="0,0,0,10" />
+
+        <TabControl Background="Transparent" BorderThickness="0">
+            <!-- ============ Fuel types ============ -->
+            <TabItem Header="Fuel Types">
+                <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="1.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="Add Fuel Type" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,14" />
+                            <TextBlock Text="Name" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding NewFuelName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                            <TextBlock Text="Unit" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding NewFuelUnit, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                            <TextBlock Text="Price" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding NewFuelPriceText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,16" />
+                            <Button Content="Add Fuel Type" Style="{StaticResource PrimaryButton}" Command="{Binding AddFuelTypeCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <DataGrid Style="{StaticResource AppDataGrid}" ItemsSource="{Binding FuelTypes}" IsReadOnly="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name, Mode=OneWay}" Width="*" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Unit" Binding="{Binding Unit, Mode=OneWay}" Width="90" IsReadOnly="True" />
+                                <DataGridTextColumn Header="Price" Binding="{Binding CurrentPrice, UpdateSourceTrigger=PropertyChanged}" Width="110" />
+                                <DataGridTemplateColumn Header="" Width="90">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Save Price" Style="{StaticResource SecondaryButton}" Padding="8,4" FontSize="11"
+                                                    Command="{Binding DataContext.UpdateFuelPriceCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ============ Tanks ============ -->
+            <TabItem Header="Tanks">
+                <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="1.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="Add Tank" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,14" />
+                            <TextBlock Text="Name" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding NewTankName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                            <TextBlock Text="Fuel Type" Style="{StaticResource FieldLabelText}" />
+                            <ComboBox Style="{StaticResource AppComboBox}" ItemsSource="{Binding FuelTypes}" DisplayMemberPath="Name"
+                                      SelectedItem="{Binding NewTankFuelType}" Margin="0,0,0,12" />
+                            <TextBlock Text="Capacity (L)" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding NewTankCapacityText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                            <TextBlock Text="Current Stock (L)" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding NewTankStockText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                            <TextBlock Text="Low-stock Threshold (L)" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding NewTankLowThresholdText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,16" />
+                            <Button Content="Add Tank" Style="{StaticResource PrimaryButton}" Command="{Binding AddTankCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <DataGrid Style="{StaticResource AppDataGrid}" ItemsSource="{Binding Tanks}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="100" />
+                                <DataGridTextColumn Header="Fuel" Binding="{Binding FuelType.Name}" Width="90" />
+                                <DataGridTextColumn Header="Stock" Binding="{Binding CurrentStock, StringFormat={}{0:N0}}" Width="80" />
+                                <DataGridTextColumn Header="Capacity" Binding="{Binding Capacity, StringFormat={}{0:N0}}" Width="80" />
+                                <DataGridTemplateColumn Header="Status" Width="100">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Border Style="{StaticResource DangerBadge}" Visibility="{Binding IsLowStock, Converter={StaticResource BoolToVisibilityConverter}}">
+                                                <TextBlock Text="LOW STOCK" Style="{StaticResource BadgeText}" Foreground="{StaticResource DangerBrush}" />
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="" Width="80">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Delete" Style="{StaticResource SecondaryButton}" Padding="8,4" FontSize="11"
+                                                    Command="{Binding DataContext.DeleteTankCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ============ Nozzles ============ -->
+            <TabItem Header="Nozzles">
+                <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="1.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="Add Nozzle" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,14" />
+                            <TextBlock Text="Name" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding NewNozzleName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                            <TextBlock Text="Tank" Style="{StaticResource FieldLabelText}" />
+                            <ComboBox Style="{StaticResource AppComboBox}" ItemsSource="{Binding Tanks}" DisplayMemberPath="Name"
+                                      SelectedItem="{Binding NewNozzleTank}" Margin="0,0,0,16" />
+                            <Button Content="Add Nozzle" Style="{StaticResource PrimaryButton}" Command="{Binding AddNozzleCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <DataGrid Style="{StaticResource AppDataGrid}" ItemsSource="{Binding Nozzles}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="100" />
+                                <DataGridTextColumn Header="Tank" Binding="{Binding Tank.Name}" Width="90" />
+                                <DataGridTextColumn Header="Last Reading" Binding="{Binding LastReading, StringFormat={}{0:N2}}" Width="110" />
+                                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="90" />
+                                <DataGridTemplateColumn Header="" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Toggle Status" Style="{StaticResource SecondaryButton}" Padding="8,4" FontSize="11"
+                                                    Command="{Binding DataContext.ToggleNozzleStatusCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ============ Purchases ============ -->
+            <TabItem Header="Fuel Purchases">
+                <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="1.5*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}" VerticalAlignment="Top">
+                        <StackPanel>
+                            <TextBlock Text="Record Delivery" Style="{StaticResource SectionHeaderText}" Margin="0,0,0,14" />
+                            <TextBlock Text="Date" Style="{StaticResource FieldLabelText}" />
+                            <DatePicker SelectedDate="{Binding PurchaseDate}" Margin="0,0,0,12" />
+                            <TextBlock Text="Fuel Type" Style="{StaticResource FieldLabelText}" />
+                            <ComboBox Style="{StaticResource AppComboBox}" ItemsSource="{Binding FuelTypes}" DisplayMemberPath="Name"
+                                      SelectedItem="{Binding PurchaseFuelType}" Margin="0,0,0,12" />
+                            <TextBlock Text="Tank" Style="{StaticResource FieldLabelText}" />
+                            <ComboBox Style="{StaticResource AppComboBox}" ItemsSource="{Binding Tanks}" DisplayMemberPath="Name"
+                                      SelectedItem="{Binding PurchaseTank}" Margin="0,0,0,12" />
+                            <TextBlock Text="Supplier" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding PurchaseSupplier, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                            <TextBlock Text="Quantity (L)" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding PurchaseQuantityText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12" />
+                            <TextBlock Text="Rate (per L)" Style="{StaticResource FieldLabelText}" />
+                            <TextBox Style="{StaticResource AppTextBox}" Text="{Binding PurchaseRateText, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,16" />
+                            <Button Content="Record Purchase" Style="{StaticResource PrimaryButton}" Command="{Binding RecordPurchaseCommand}" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <DataGrid Style="{StaticResource AppDataGrid}" ItemsSource="{Binding Purchases}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=d}" Width="90" />
+                                <DataGridTextColumn Header="Fuel" Binding="{Binding FuelType.Name}" Width="80" />
+                                <DataGridTextColumn Header="Tank" Binding="{Binding Tank.Name}" Width="80" />
+                                <DataGridTextColumn Header="Supplier" Binding="{Binding Supplier}" Width="120" />
+                                <DataGridTextColumn Header="Qty" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="70" />
+                                <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat={}Rs. {0:N2}}" Width="*" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </StackPanel>
+</UserControl>
