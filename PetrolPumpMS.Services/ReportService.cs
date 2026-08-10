@@ -23,12 +23,25 @@ public class ReportService : IReportService
         return new DashboardStats(salesTotal, txnCount, expenseTotal, creditOutstanding);
     }
 
-    public Task<List<FuelSalesSummary>> SalesByFuelTypeAsync(DateTime from, DateTime to) =>
-        _db.Sales.Where(s => s.Date >= from.Date && s.Date <= to.Date)
-            .Include(s => s.FuelType)
-            .GroupBy(s => s.FuelType!.Name)
-            .Select(g => new FuelSalesSummary(g.Key, g.Sum(x => x.Quantity), g.Sum(x => x.Amount)))
+    public async Task<List<FuelSalesSummary>> SalesByFuelTypeAsync(DateTime from, DateTime to)
+    {
+        // Same fix as EmployeePerformanceAsync: flatten the join to SQL first,
+        // then group + double-Sum in memory (two Sums on one grouped Include-join
+        // is not translatable).
+        var flat = await _db.Sales
+            .Where(s => s.Date >= from.Date && s.Date <= to.Date)
+            .Select(s => new
+            {
+                FuelTypeName = s.FuelType != null ? s.FuelType.Name : "Unknown",
+                s.Quantity,
+                s.Amount
+            })
             .ToListAsync();
+
+        return flat.GroupBy(x => x.FuelTypeName)
+            .Select(g => new FuelSalesSummary(g.Key, g.Sum(x => x.Quantity), g.Sum(x => x.Amount)))
+            .ToList();
+    }
 
     public Task<List<PaymentModeSummary>> SalesByPaymentModeAsync(DateTime from, DateTime to) =>
         _db.Sales.Where(s => s.Date >= from.Date && s.Date <= to.Date)
@@ -46,11 +59,24 @@ public class ReportService : IReportService
         return raw.OrderBy(x => x.Key).Select(x => new DailyTotal(x.Key, x.Total)).ToList();
     }
 
-    public Task<List<EmployeePerformance>> EmployeePerformanceAsync(DateTime from, DateTime to) =>
-        _db.Sales.Where(s => s.Date >= from.Date && s.Date <= to.Date)
-            .Include(s => s.Employee)
-            .GroupBy(s => s.Employee != null ? s.Employee.Name : "Unassigned")
+    public async Task<List<EmployeePerformance>> EmployeePerformanceAsync(DateTime from, DateTime to)
+    {
+        // Project a flat, single-aggregate-free shape first (this part IS translatable to SQL),
+        // then group + sum in memory. Doing two Sum()s on the same grouped left-join in one
+        // EF query is what was failing to translate.
+        var flat = await _db.Sales
+            .Where(s => s.Date >= from.Date && s.Date <= to.Date)
+            .Select(s => new
+            {
+                EmployeeName = s.Employee != null ? s.Employee.Name : "Unassigned",
+                s.Amount,
+                s.Quantity
+            })
+            .ToListAsync();
+
+        return flat.GroupBy(x => x.EmployeeName)
             .Select(g => new EmployeePerformance(g.Key, g.Sum(x => x.Amount), g.Sum(x => x.Quantity)))
             .OrderByDescending(x => x.TotalAmount)
-            .ToListAsync();
+            .ToList();
+    }
 }
