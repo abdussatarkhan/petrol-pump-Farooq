@@ -1,5 +1,6 @@
 # Petrol Pump Management & Inventory ERP System
 
+[![CI](https://github.com/abdussatarkhan/petrol-pump-Farooq/actions/workflows/ci.yml/badge.svg)](https://github.com/abdussatarkhan/petrol-pump-Farooq/actions)
 [![WPF](https://img.shields.io/badge/WPF-.NET_8-512BD4?style=for-the-badge&logo=windows&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/) [![C#](https://img.shields.io/badge/C%23-MVVM_Architecture-239120?style=for-the-badge&logo=csharp&logoColor=white)](https://learn.microsoft.com/en-us/dotnet/csharp/) [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-EF_Core-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Author](https://img.shields.io/badge/Author-Abdussatar-E50914?style=for-the-badge&logo=github&logoColor=white)](https://github.com/abdussatarkhan)
 
@@ -46,6 +47,16 @@ source venv/bin/activate  # On Windows: .\venv\Scripts\activate
 # Install dependencies (if requirements.txt exists)
 pip install -r requirements.txt
 ```
+
+---
+
+## 🗺️ Roadmap & Upcoming Features
+
+- [x] WPF (.NET 8) MVVM architecture with PostgreSQL & EF Core
+- [x] Multi-nozzle meter reading and shift reconciliation
+- [ ] PDF & ESC-POS thermal receipt printer integration
+- [ ] Offline SQLite local caching with central DB sync
+- [ ] Daily profit & loss automated SMS/WhatsApp alerts
 
 ---
 
